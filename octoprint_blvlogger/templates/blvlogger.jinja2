@@ -1,0 +1,10 @@
+<div class="row-fluid" id="blvlogger" style="text-align: center;padding-top: 20px;" >
+    <div class="control-group" data-bind="visible: mesh_data().length > 0" style="display: none">
+		<label class="control-label">{{ _('Time') }}</label>
+		<div class="controls">
+			<select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}">
+                <option data-bind="value: $data[0], text: $data[0]"></option>
+            </select>
+		</div>
+	</div>
+</div>

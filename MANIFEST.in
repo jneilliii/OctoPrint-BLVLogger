@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_blvlogger/templates *
+recursive-include octoprint_blvlogger/translations *
+recursive-include octoprint_blvlogger/static *
