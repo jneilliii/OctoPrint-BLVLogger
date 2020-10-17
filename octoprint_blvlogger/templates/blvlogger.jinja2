@@ -1,10 +1,22 @@
-<div class="row-fluid" id="blvlogger" style="text-align: center;padding-top: 20px;" >
-    <div class="control-group" data-bind="visible: mesh_data().length > 0" style="display: none">
+<div class="row-fluid form-inline" id="blvlogger" style="text-align: center;padding-top: 20px;" >
+    <div class="control-group span4">
+		<label class="control-label">{{ _('Start') }}</label>
+		<div class="controls">
+			<input class="input" type="date" data-bind="value: start_time, event: {change: update_time_frame}, attr: {max: end_time()}" style="width: 130px"/>
+		</div>
+	</div>
+    <div class="control-group span4" data-bind="visible: mesh_data().length > 0" style="display: none">
 		<label class="control-label">{{ _('Time') }}</label>
 		<div class="controls">
-			<select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}">
-                <option data-bind="value: $data[0], text: $data[0]"></option>
+			<select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}" style="width: 180px">
+                <option data-bind="value: $data[0], text: new moment($data[0]).format('YYYY-MM-DD hh:mm:ss')"></option>
             </select>
+		</div>
+	</div>
+    <div class="control-group span4">
+		<label class="control-label">{{ _('End') }}</label>
+		<div class="controls">
+			<input class="input" type="date" data-bind="value: end_time, event: {change: update_time_frame}, attr: {min: start_time()}" style="width: 130px"/>
 		</div>
 	</div>
 </div>

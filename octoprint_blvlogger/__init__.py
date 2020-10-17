@@ -4,8 +4,9 @@ from __future__ import absolute_import
 import json
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import flask
 import octoprint.plugin
 
 
@@ -64,15 +65,35 @@ class BlvloggerPlugin(
                 db.commit()
                 db.close()
                 self.send_history_data()
+        if event == "ClientOpened":
+            self.send_history_data()
+
+    ##~~ SimpleApiPlugin mixin
+
+    def on_api_get(self, request):
+        if request.args.get("start") and request.args.get("end"):
+            self.send_history_data(
+                start=request.args.get("start"), end=request.args.get("end")
+            )
+            return flask.jsonify(
+                start=request.args.get("start"), end=request.args.get("end")
+            )
+        else:
+            return flask.make_response("There was an error", 200)
 
     ##~~ Utility Functions
 
-    def send_history_data(self):
+    def send_history_data(self, start=None, end=None):
         if self.db_path is not None:
+            if start is None:
+                start = datetime.today().date() - timedelta(days=1)
+            if end is None:
+                end = datetime.today().date() + timedelta(days=1)
             db = sqlite3.connect(self.db_path)
             cursor = db.cursor()
             cursor.execute(
-                """SELECT timestamp, mesh, bed FROM mesh_history_data ORDER BY timestamp DESC"""
+                """SELECT timestamp, mesh, bed FROM mesh_history_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC""",
+                [start, end],
             )
             mesh_history_data = {"mesh": cursor.fetchall()}
             self._plugin_manager.send_plugin_message(self._identifier, mesh_history_data)
@@ -89,6 +110,18 @@ class BlvloggerPlugin(
                 "user": "jneilliii",
                 "repo": "OctoPrint-BLVLogger",
                 "current": self._plugin_version,
+                "stable_branch": {
+                    "name": "Stable",
+                    "branch": "master",
+                    "comittish": ["master"],
+                },
+                "prerelease_branches": [
+                    {
+                        "name": "Release Candidate",
+                        "branch": "rc",
+                        "comittish": ["rc", "master"],
+                    }
+                ],
                 # update method: pip
                 "pip": "https://github.com/jneilliii/OctoPrint-BLVLogger/archive/{target_version}.zip",
             }
