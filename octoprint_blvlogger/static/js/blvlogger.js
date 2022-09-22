@@ -16,7 +16,8 @@ $(function() {
         self.mesh_data = ko.observableArray([]);
         self.start_time = ko.observable(new moment().format('YYYY-MM-DD'));
         self.end_time = ko.observable(new moment().format('YYYY-MM-DD'));
-        self.current_mesh_data = ko.observable();//este es el value del <select>
+        self.current_mesh_data = ko.observable();
+        self.current_mesh_index = ko.observable();
         self.id = ko.observable();
         self.mesh_id_in_eeprom = ko.observable();
         self.mesh_gcode_in_eeprom = ko.observable();
@@ -30,6 +31,7 @@ $(function() {
             } else {
                 return ko.utils.arrayFirst(self.mesh_data(), function(item) {
                     self.id(item[3]);
+                    self.current_mesh_index(self.mesh_data().indexOf(item));
                     return item[0] === search;//timestamp  //arrayFirst=expects a function that returns true or false, evaluating each item. The first item for which the function returns true is returned. 
                 });
             }
@@ -41,11 +43,8 @@ $(function() {
             return available_ids_array;
         });
 
-        //Esto parece ejecutarse al cargar el plugin, cuando el html ya se ha renderizado
         self.onDataUpdaterPluginMessage = function (plugin, mesh_data) {
             if (plugin !== "blvlogger") { return; }
-            console.log("----------- onDataUpdaterPluginMessage -------------")
-            console.log(mesh_data["mesh"]);
             self.mesh_data(mesh_data["mesh"]);
 
             self.mesh_id_in_eeprom(self.settingsViewModel.settings.plugins.blvlogger.last_mesh_id_saved_in_eeprom());
@@ -90,8 +89,8 @@ $(function() {
         //https://docs.octoprint.org/en/master/plugins/viewmodels.html
         self.onBeforeBinding = function(){
             $('#bedlevelvisualizergraph').next('div').replaceWith($('#blvlogger'));
-            //añadimos un boton nuevo
-            $('#bedlevelvisualizerbutton > button:first').after($('#deleteMeshFromDB'));
+
+                $('#bedlevelvisualizerbutton > button:first').after($('#deleteMeshFromDB'));
             $('#bedlevelvisualizerbutton > button:first').after($('#saveInEEPROM'));
 
             $('#bedlevelvisualizerbutton').after($('#config_file_mesh_info'));
@@ -142,10 +141,8 @@ $(function() {
                 contentType: "application/json; charset=UTF-8"
             }).done(function(data){
                 if(data.deleted_rows){
-                    alert("total deleted rows" + data.deleted_rows)
-                    console.log(data)
-                    console.log("ELIMINADO")
-                    new PNotify({title: 'Eliminado',text: '<div class="row-fluid">El mesh ha sido eliminado de la DB</div>', type: 'info', hide: false});
+                    self.mesh_data.splice(self.current_mesh_index(), 1);
+                    new PNotify({title: 'Removed',text: '<div class="row-fluid">Mesh removed from DB</div>', type: 'info', hide: false});
                 }
                 });
         };
@@ -153,7 +150,6 @@ $(function() {
         self.generateTxtAndDownload = function() {
             var text_string = "probando";
             text_string = self.mesh_gcode_in_eeprom();
-            //var json_string = JSON.stringify(text_string, undefined, 2);
 
             let mesh_data = text_string;
 
@@ -178,7 +174,6 @@ $(function() {
             link.href = window.URL.createObjectURL(blob);
             link.click();
         }
-
 
     }
 
