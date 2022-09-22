@@ -37,9 +37,10 @@ class BlvloggerPlugin(
             db.close()
 
     ##~~ SettingsPlugin mixin
+    #       https://docs.octoprint.org/en/master/plugins/mixins.html
 
     def get_settings_defaults(self):
-        return {}
+        return { 'last_mesh_id_saved_in_eeprom': None, 'last_mesh_gcode_saved_in_eeprom': None }
 
     ##~~ AssetPlugin mixin
 
@@ -70,6 +71,9 @@ class BlvloggerPlugin(
 
     ##~~ SimpleApiPlugin mixin
 
+    def get_api_commands(self):
+        return dict(stopProcessing=[])
+
     def on_api_get(self, request):
         if request.args.get("start") and request.args.get("end"):
             self.send_history_data(
@@ -78,6 +82,10 @@ class BlvloggerPlugin(
             return flask.jsonify(
                 start=request.args.get("start"), end=request.args.get("end")
             )
+        elif request.args.get("remove_history_data_by_id"):
+            _id = request.args.get("remove_history_data_by_id")
+            result = self.remove_history_data(_id)
+            return flask.jsonify(result)
         else:
             return flask.make_response("There was an error", 200)
 
@@ -92,11 +100,29 @@ class BlvloggerPlugin(
             db = sqlite3.connect(self.db_path)
             cursor = db.cursor()
             cursor.execute(
-                """SELECT timestamp, mesh, bed FROM mesh_history_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC""",
+                """SELECT timestamp, mesh, bed, id FROM mesh_history_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC""",
                 [start, end],
             )
             mesh_history_data = {"mesh": cursor.fetchall()}
             self._plugin_manager.send_plugin_message(self._identifier, mesh_history_data)
+
+    def remove_history_data(self, _id):
+        if self.db_path is not None and _id is not None:
+            db = sqlite3.connect(self.db_path)
+            cursor = db.cursor()
+            cursor.execute(
+                """DELETE FROM mesh_history_data WHERE id=?""",
+                [_id],
+            )
+            #return_data = {"blvlogger_deleted": cursor.fetchall()}
+            #self._plugin_manager.send_plugin_message(self._identifier, mesh_history_data)
+            try:
+                db.commit()
+                if cursor.rowcount:
+                    return {'deleted_rows': cursor.rowcount}
+            except Exception:
+                return False
+
 
     ##~~ Softwareupdate hook
 
