@@ -3,7 +3,6 @@
     <div class="control-group span2">
 		<label class="control-label">{{ _('ID') }}</label>
 		<div class="controls">
-			<!--<input class="input" type="text" data-bind="value: mesh_id_in_eeprom() ? mesh_id_in_eeprom() : id()" style="width: 30px" disabled/>-->
 			<input class="input" type="text" data-bind="value: id(), attr: {id: 'inputShowID' }" style="width: 30px" disabled/>
 		</div>
 	</div>
@@ -18,9 +17,8 @@
 		<label class="control-label">{{ _('Time') }}</label>
 		<div class="controls">
 			
-			<select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}" style="width: 170px">
+	    <select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}" style="width: 170px">
                 <option data-bind="value: $data[0], text: '[#' + $data[3] + '] ' + new moment($data[0]).format('YYYY-MM-DD hh:mm:ss'), attr: {id: $data[3] }"></option>
-                <!-- attr: { selected: ($data[3] === $root.mesh_id_in_eeprom() ? 'selected' : null) } --> 
             </select>
 
 		</div>
@@ -35,26 +33,15 @@
 </div>
 
 
-<!--
-<div id="alohomora"> PROBANDO </div>
--->
-<!--
-<button name="saveInEEPROM" class="btn btn-primary"
-	data-bind="click: !processing() ? updateMesh : cancelMeshUpdate, enable: controlViewModel.isOperational() &amp;&amp; !controlViewModel.isPrinting() &amp;&amp; loginStateViewModel.isUser() &amp;&amp; settingsViewModel.settings.plugins.bedlevelvisualizer.command() !== '', css: !processing() ? 'btn-primary' : 'btn-danger',attr: {'title': !processing() ? 'Run Mesh Update Process' : 'Cancel Mesh Update Process'}"
-	disabled=""
-	title="Run Mesh Update Process">
-	<i class="icon-2 icon-info-sign" data-bind="attr: {'title': mesh_status}" data-toggle="tooltip" title="" data-original-title="Using saved mesh data from 21/9/2022, 10:59:12."></i>
-	<span data-bind="text: !processing() ? 'Update Mesh Now' : 'Cancel'">Update Mesh Now</span>
-</button>
--->
+
 <button id="saveInEEPROM" class="btn btn-info" style="margin-left:4px;" data-bind="value: id, click: updateMeshEEPROM, enable: controlViewModel.isOperational() &amp;&amp; !controlViewModel.isPrinting()" disabled="">
-	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Guarda en la EEPROM el mesh seleccionado" data-bind="attr: {title: 'Esto guardará en el Slot 0 de la EEPROM, el mesh seleccionado #' + id() }"></i>
+	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Save selected mesh in EPROOM" data-bind="attr: {title: 'This will save into Slot 0 of EEPROM, the selected mesh id #' + id() }"></i>
 	<span data-bind="text: 'Save mesh #'+id()+' in EEPROM'">Save in EEPROM</span>
 </button>
 
 
 <button id="deleteMeshFromDB" class="btn btn-info" style="margin-left:4px;" data-bind="value: id, click: deleteRowByID">
-	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Borra de la DB el mesh seleccionado" data-bind="attr: {title: 'Esto eliminará el mesh seleccionado #' + id() }"></i>
+	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Remove selected mesh from DB" data-bind="attr: {title: 'This action will remove the next mesh id #' + id() }"></i>
 	<span data-bind="text: 'Delete mesh #'+id()+' from DB'">Remove from DB</span>
 </button>
 
@@ -66,6 +53,6 @@
 	</p>
 	<p>
 		EEPROM actual Mesh GCODE:
-		<span id="current_mesh_gcode" style="font-family: 'Lucida Console', monospace; font-weight: bold;" data-bind="click: generateTxtAndDownload">Descargar</span>
+		<span id="current_mesh_gcode" style="font-family: 'Lucida Console', monospace; font-weight: bold;" data-bind="click: generateTxtAndDownload">Download</span>
 	</p>
 </div>
