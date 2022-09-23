@@ -104,6 +104,7 @@ $(function() {
             let count = 0;
             for (let i = 0; i < mesh_data.length; i++) {
                 for (let j = 0; j < mesh_data.length; j++) {
+                    mesh_data[j][i] = mesh_data[j][i].replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
                     gcode_cmds.push(`M421 I${i} J${j} Z${mesh_data[j][i]}`);
                     count++;
                 }
@@ -159,6 +160,7 @@ $(function() {
             let count = 0;
             for (let i = 0; i < mesh_data.length; i++) {
                 for (let j = 0; j < mesh_data.length; j++) {
+                    mesh_data[j][i] = mesh_data[j][i].replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
                     gcode_cmds.push(`M421 I${i} J${j} Z${mesh_data[j][i]}`);
                     count++;
                 }
