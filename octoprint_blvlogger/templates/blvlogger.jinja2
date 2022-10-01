@@ -1,22 +1,58 @@
 <div class="row-fluid form-inline" id="blvlogger" style="text-align: center;padding-top: 20px;" >
-    <div class="control-group span4">
+
+    <div class="control-group span2">
+		<label class="control-label">{{ _('ID') }}</label>
+		<div class="controls">
+			<input class="input" type="text" data-bind="value: id(), attr: {id: 'inputShowID' }" style="width: 30px" disabled/>
+		</div>
+	</div>
+
+    <div class="control-group span3">
 		<label class="control-label">{{ _('Start') }}</label>
 		<div class="controls">
-			<input class="input" type="date" data-bind="value: start_time, event: {change: update_time_frame}, attr: {max: end_time()}" style="width: 130px"/>
+			<input class="input" type="date" data-bind="value: start_time, event: {change: update_time_frame}, attr: {max: end_time()}" style="width: 100px"/>
 		</div>
 	</div>
     <div class="control-group span4" data-bind="visible: mesh_data().length > 0" style="display: none">
 		<label class="control-label">{{ _('Time') }}</label>
 		<div class="controls">
-			<select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}" style="width: 180px">
-                <option data-bind="value: $data[0], text: new moment($data[0]).format('YYYY-MM-DD hh:mm:ss')"></option>
+			
+	    <select data-bind="foreach: mesh_data,value: current_mesh_data, event:{change: $root.graph_data}" style="width: 170px">
+                <option data-bind="value: $data[0], text: '[#' + $data[3] + '] ' + new moment($data[0]).format('YYYY-MM-DD hh:mm:ss'), attr: {id: $data[3] }"></option>
             </select>
+
 		</div>
 	</div>
-    <div class="control-group span4">
+    <div class="control-group span3">
 		<label class="control-label">{{ _('End') }}</label>
 		<div class="controls">
-			<input class="input" type="date" data-bind="value: end_time, event: {change: update_time_frame}, attr: {min: start_time()}" style="width: 130px"/>
+			<input class="input" type="date" data-bind="value: end_time, event: {change: update_time_frame}, attr: {min: start_time()}" style="width: 100px"/>
 		</div>
 	</div>
+
+</div>
+
+
+
+<button id="saveInEEPROM" class="btn btn-info" style="margin-left:4px;" data-bind="value: id, click: updateMeshEEPROM, enable: controlViewModel.isOperational() &amp;&amp; !controlViewModel.isPrinting()" disabled="">
+	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Save selected mesh in EPROOM" data-bind="attr: {title: 'This will save into Slot 0 of EEPROM, the selected mesh id #' + id() }"></i>
+	<span data-bind="text: 'Save mesh #'+id()+' in EEPROM'">Save in EEPROM</span>
+</button>
+
+
+<button id="deleteMeshFromDB" class="btn btn-info" style="margin-left:4px;" data-bind="value: id, click: deleteRowByID">
+	<i class="icon-2 icon-info-sign" data-toggle="tooltip" data-original-title="Remove selected mesh from DB" data-bind="attr: {title: 'This action will remove the next mesh id #' + id() }"></i>
+	<span data-bind="text: 'Delete mesh #'+id()+' from DB'">Remove from DB</span>
+</button>
+
+
+<div class="row-fluid form-inline" id="config_file_mesh_info" style="text-align: center;padding-top: 20px;" >
+	<p>
+		EEPROM actual Mesh #ID:
+		<span style="font-family: 'Lucida Console', monospace; font-weight: bold;" data-bind="text: mesh_id_in_eeprom, style: { color: available_ids().indexOf(mesh_id_in_eeprom()) == -1 ? 'red' : 'green' }"></span>
+	</p>
+	<p>
+		EEPROM actual Mesh GCODE:
+		<span id="current_mesh_gcode" style="font-family: 'Lucida Console', monospace; font-weight: bold;" data-bind="click: generateTxtAndDownload">Download</span>
+	</p>
 </div>
