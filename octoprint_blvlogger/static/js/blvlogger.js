@@ -32,7 +32,7 @@ $(function() {
                 return ko.utils.arrayFirst(self.mesh_data(), function(item) {
                     self.id(item[3]);
                     self.current_mesh_index(self.mesh_data().indexOf(item));
-                    return item[0] === search;//timestamp  //arrayFirst=expects a function that returns true or false, evaluating each item. The first item for which the function returns true is returned. 
+                    return item[0] === search;//timestamp  //arrayFirst=expects a function that returns true or false, evaluating each item. The first item for which the function returns true is returned.
                 });
             }
         });
@@ -104,7 +104,7 @@ $(function() {
             let count = 0;
             for (let i = 0; i < mesh_data.length; i++) {
                 for (let j = 0; j < mesh_data.length; j++) {
-                    mesh_data[j][i] = mesh_data[j][i].replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
+                    mesh_data[j][i] = mesh_data[j][i].toString().replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
                     gcode_cmds.push(`M421 I${i} J${j} Z${mesh_data[j][i]}`);
                     count++;
                 }
@@ -155,12 +155,12 @@ $(function() {
             let mesh_data = text_string;
 
             header = '; MESH ID #' + self.mesh_id_in_eeprom()
-            let gcode_cmds = [header, 'G29 L0; (OPCIONAL). esto nos situa en el slot 0. Cargamos y seleccionamos este slot para los siguientes gcodes','G29 I999'] //'G29 L0'; slot 0. Cargamos y seleccionamos este slot para los siguientes M421
+            let gcode_cmds = [header, 'G29 L0; (OPTIONAL). this places us in slot 0. We load and select this slot for the following gcodes','G29 I999'] //'G29 L0'; slot 0. We load and select this slot for the following M421
 
             let count = 0;
             for (let i = 0; i < mesh_data.length; i++) {
                 for (let j = 0; j < mesh_data.length; j++) {
-                    mesh_data[j][i] = mesh_data[j][i].replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
+                    mesh_data[j][i] = mesh_data[j][i].toString().replace('+','');//+ symbol not needed in Gcode for positive values, only - is needed for negative ones
                     gcode_cmds.push(`M421 I${i} J${j} Z${mesh_data[j][i]}`);
                     count++;
                 }
